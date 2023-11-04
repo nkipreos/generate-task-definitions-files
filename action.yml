@@ -1,0 +1,24 @@
+name: 'Generate-Task-Definition-File'
+description: 'GitHub Action that generates a task definition from a base file and values file'
+author: 'Javier Reyes <@javierreyeso>'
+inputs:
+  base_file:
+    description: 'json file used as the base file for generating task definition files.'
+    required: true
+  values_file:
+    description: 'yml file containing the values to be replaced in the generated task definition file.'
+    required: true
+  dd_version:
+    description: 'datadog version string for the generated task definition'
+    required: true
+  container_image:
+    description: 'docker image arn with the commit tag'
+    required: true
+
+branding:
+  color: 'gray-dark'
+  icon: 'file-text'
+
+runs:
+  using: 'node16'
+  main: 'lib/index.js'
