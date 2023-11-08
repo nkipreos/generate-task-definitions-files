@@ -10,19 +10,13 @@
 
 **Required** Name of the yml file that contain the values replaced on the task definitions.
 
-### `dd_version`
-
-**Required** Commit hash used as datadog version value
-
-
 ## Example usage
 
 ```yaml
-uses: MigranteSF/generate-task-definition-file@v1
+uses: JavierReyesO/generate-task-definition-file@v1
 with:
   base_file: '.aws/dev-task-definition.json'
   values_file: '.aws/dev-values.yml'
-  dd_version: ${{ github.sha }}
 ```
 
 ## Development
@@ -34,4 +28,4 @@ For the development and update of the Action, after modifying the `index.js` fil
 ```
 ncc build index.js
 ```
-After this, the action itself uses the generated `dist/index.js` file, but it is necessary to upload both the `dist/index.js` file and the `index.js` file.
+After this, the action itself uses the generated `lib/index.js` file, but it is necessary to upload both the `lib/index.js` file and the `index.js` file.
