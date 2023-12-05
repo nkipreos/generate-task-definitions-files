@@ -15,16 +15,25 @@ function loadValue(key, value) {
   }
 }
 
+function getPath(baseData, jsonRoute) {
+  let position = baseData;
+  for (let i = 0; i < jsonRoute.length - 1; i++) {
+    position = position[jsonRoute[i]];
+  }
+  return position;
+}
+
 async function generateJsonFiles() {
   try {
     const baseFile = core.getInput('base_file');
     const valuesFile = core.getInput('values_file');
 
-    const container_image = core.getInput('container_image')
-    const dd_version_variable = {
+    const container_image = core.getInput('container_image');
+    const dd_version_value = core.getInput('dd_version');
+    const dd_version_block = {
       name: 'DD_VERSION',
-      value: core.getInput('dd_version'),
-    }
+      value: dd_version_value,
+    };
 
     const replaceRoutes = {
       family: ['family'],
@@ -33,6 +42,7 @@ async function generateJsonFiles() {
       taskRoleArn: ['taskRoleArn'],
       container_name: ['containerDefinitions', 0, 'name'],
       command: ['containerDefinitions', 0, 'command'],
+      log_group: ['containerDefinitions', 0, 'logConfiguration', 'options', 'awslogs-group'],
       portMappings: ['containerDefinitions', 0, 'portMappings'],
       dd_service: ['containerDefinitions', 0, 'logConfiguration', 'options', 'dd_service'],
     };
@@ -44,22 +54,30 @@ async function generateJsonFiles() {
       const values = taskData[container];
       for (const key in values) {
         const value = values[key];
+
+        if (key === 'have_nginx') {
+          if (!value) {
+            baseData.containerDefinitions.splice(1, 1);
+          }
+          continue;
+        }
         let position = baseData;
         const jsonRoute = replaceRoutes[key];
 
         if (Array.isArray(jsonRoute)) {
-          let position = baseData;
-          for (let i = 0; i < jsonRoute.length - 1; i++) {
-            position = position[jsonRoute[i]];
-          }
+          const position = getPath(baseData, jsonRoute);
           position[jsonRoute[jsonRoute.length - 1]] = loadValue(key, value);
         } else {
-          console.error(`Ruta no definida para la clave: ${key}`);
+          console.error(`Path not defined for the key: ${key}`);
         }
       }
 
-      baseData.containerDefinitions[0].image = container_image;
-      baseData.containerDefinitions[0].environment.push(dd_version_variable);
+      baseData.containerDefinitions[0].image = container_image !== "" ? container_image : baseData.containerDefinitions[0].image;
+
+      if (dd_version_value !== "") {
+        baseData.containerDefinitions[0].environment.push(dd_version_block);
+      }
+
       fs.writeFileSync(`${container}.json`, JSON.stringify(baseData, null, 2));
     }
 
