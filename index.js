@@ -85,7 +85,9 @@ async function generateJsonFiles() {
     const artifactName = 'generated-json-files';
     const filesToUpload = fs.readdirSync('.', { withFileTypes: true })
       .filter(dirent => dirent.isFile() && dirent.name.endsWith('.json'))
-      .map(dirent => dirent.name);
+      .map(dirent => "./" + dirent.name);
+    console.log(artifactName);
+    console.log(filesToUpload);
 
     const artifact = new DefaultArtifactClient()
     await artifact.uploadArtifact(artifactName, filesToUpload, {}).catch(error => {
