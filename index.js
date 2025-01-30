@@ -81,13 +81,13 @@ async function generateJsonFiles() {
       fs.writeFileSync(`${container}.json`, JSON.stringify(baseData, null, 2));
     }
 
-    const artifactClient = artifact.create()
+
     const artifactName = 'generated-json-files';
     const filesToUpload = fs.readdirSync('.', { withFileTypes: true })
       .filter(dirent => dirent.isFile() && dirent.name.endsWith('.json'))
       .map(dirent => dirent.name);
 
-    await artifactClient.uploadArtifact(artifactName, filesToUpload, '.').catch(error => {
+    await artifact.uploadArtifact(artifactName, filesToUpload, {}).catch(error => {
       core.setFailed(`Error uploading artifact: ${error}`);
     });
 
