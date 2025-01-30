@@ -90,6 +90,11 @@ async function generateJsonFiles() {
     console.log(filesToUpload);
 
     const artifact = new DefaultArtifactClient()
+    try{
+    await artifact.deleteArtifact(artifactName);
+    } catch(error) {
+      console.log(`Error in deleting artifact: ${error}`)
+    }
     await artifact.uploadArtifact(artifactName, filesToUpload, '.').catch(error => {
       core.setFailed(`Error uploading artifact: ${error}`);
     });
