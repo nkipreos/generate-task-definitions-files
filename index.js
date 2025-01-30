@@ -1,4 +1,4 @@
-const artifact = require('@actions/artifact');
+const {DefaultArtifactClient} = require('@actions/artifact')
 const core = require('@actions/core');
 const fs = require('fs');
 const yaml = require('js-yaml');
@@ -87,6 +87,7 @@ async function generateJsonFiles() {
       .filter(dirent => dirent.isFile() && dirent.name.endsWith('.json'))
       .map(dirent => dirent.name);
 
+    const artifact = new DefaultArtifactClient()
     await artifact.uploadArtifact(artifactName, filesToUpload, {}).catch(error => {
       core.setFailed(`Error uploading artifact: ${error}`);
     });
